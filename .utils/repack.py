@@ -5,6 +5,7 @@ import tarfile
 
 from ext import asset_packer
 from ext import tarball
+from ext import ziparch
 
 RESOURCE_ENTRY_NAME_MAX_LENGTH = 100
 
@@ -23,11 +24,11 @@ def repack(pack_set: pathlib.Path) -> None:
     output = pack_set / "download"
     shutil.rmtree(output, ignore_errors=True)
     output.mkdir(parents=True, exist_ok=True)
-    pack_zip = output / (pack_set.name + ".zip")
-    pack_targz = pack_zip.with_suffix(tarball.TAR_GZIP_EXTENSION)
+    pack_zip = output / (pack_set.name + ziparch.ZIP_ARCH_EXTENSION)
+    pack_tar = output / (pack_set.name + tarball.TAR_GZIP_EXTENSION)
 
-    shutil.make_archive(pack_zip.with_suffix(""), "zip", packed)
-    tarball.compress_tree_tarball(str(packed), str(pack_targz), filter=_tar_filter)
+    ziparch.compress_tree_ziparch(str(packed), str(pack_zip))
+    tarball.compress_tree_tarball(str(packed), str(pack_tar), filter=_tar_filter)
 
     shutil.rmtree(packed)
 
