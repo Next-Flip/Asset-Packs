@@ -6,7 +6,7 @@ on:
 
 jobs:
   poll:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
 
       - name: "Setup Python"
@@ -23,6 +23,12 @@ jobs:
       - name: "Repack everything"
         run: |
           make repack
+
+      - name: "Upload artifacts to GitHub"
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            */download
 
       - name: "Check for uncommitted changes"
         run: |
