@@ -39,9 +39,4 @@ jobs:
       - name: "Check deterministic diff"
         run: |
           gunzip -- */download/*.tar.gz
-          git rm -- */download/*.tar.gz
-          git add -- */download/*.tar
-
-      - name: "Check for uncommitted changes"
-        run: |
           git diff --exit-code -- */download/*.tar
