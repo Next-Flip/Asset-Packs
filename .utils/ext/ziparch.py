@@ -27,7 +27,8 @@ def compress_tree_ziparch(
         compression=ZIP_COMPRESS_TYPE,
         compresslevel=gz_level,
     ) as ziparch:
-        for cur, dirs, files in top.walk():
+        for cur, dirs, files in os.walk(top):
+            cur = pathlib.Path(cur)
 
             if cur != top:
                 zipinfo = zipfile.ZipInfo.from_file(cur, cur.relative_to(top))
