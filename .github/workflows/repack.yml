@@ -12,13 +12,19 @@ jobs:
       - name: "Setup Python"
         uses: "actions/setup-python@v4"
         with:
-          python-version: 3.12.4
+          python-version: 3.11.9
 
       - name: "Checkout code"
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
           ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: "Prepare deterministic diff"
+        run: |
+          gunzip --keep -- */download/*.tar.gz
+          git rm -- */download/*.tar.gz
+          git add -- */download/*.tar
 
       - name: "Repack everything"
         run: |
@@ -30,6 +36,12 @@ jobs:
           path: |
             */download
 
+      - name: "Check deterministic diff"
+        run: |
+          gunzip -- */download/*.tar.gz
+          git rm -- */download/*.tar.gz
+          git add -- */download/*.tar
+
       - name: "Check for uncommitted changes"
         run: |
-          git diff --exit-code
+          git diff --exit-code -- */download/*.tar
