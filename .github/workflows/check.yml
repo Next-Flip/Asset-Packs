@@ -1,11 +1,11 @@
-name: "Repack"
+name: "Check"
 
 on:
   push:
   pull_request:
 
 jobs:
-  repack:
+  check:
     runs-on: ubuntu-latest
     steps:
 
@@ -19,6 +19,10 @@ jobs:
         with:
           fetch-depth: 1
           ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: "Check packs format"
+        run: |
+          make check
 
       - name: "Prepare deterministic diff"
         run: |

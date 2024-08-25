@@ -4,6 +4,10 @@ VERSION := 0.0.0
 repack: venv requirements
 	./.venv/bin/python3 .utils/repack.py
 
+.PHONY: check
+check: venv requirements
+	./.venv/bin/python3 .utils/check.py
+
 venv:
 	python3 -m venv .venv
 
