@@ -11,6 +11,9 @@ from ext import ziparch
 
 RESOURCE_ENTRY_NAME_MAX_LENGTH = 100
 
+here = pathlib.Path(__file__).parent
+packs_root = here.parent
+
 
 def _tar_filter(tarinfo: tarfile.TarInfo) -> tarfile.TarInfo:
     if len(tarinfo.name) > RESOURCE_ENTRY_NAME_MAX_LENGTH:
@@ -37,17 +40,18 @@ def repack(pack_set: pathlib.Path) -> None:
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    root = pathlib.Path(__file__).parent.parent
+
     if args:
         pack_sets = args
     else:
         pack_sets = [
             pack_set.name
-            for pack_set in root.iterdir()
+            for pack_set in packs_root.iterdir()
             if not pack_set.name.startswith(".")
         ]
+
     for pack_set in pack_sets:
-        pack_set = root / pack_set
+        pack_set = packs_root / pack_set
         if not pack_set.is_dir():
             if args:
                 print(f"\nPack '{pack_set.name}' does not exist!\n", flush=True)
