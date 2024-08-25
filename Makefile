@@ -1,8 +1,16 @@
 VERSION := 0.0.0
 
+# If the first argument is "repack"...
+ifeq (repack,$(firstword $(MAKECMDGOALS)))
+  # use the rest as arguments for "repack"
+  REPACK_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  # ...and turn them into do-nothing targets
+  $(eval $(REPACK_ARGS):;@:)
+endif
+
 .PHONY: repack
 repack: venv requirements
-	./.venv/bin/python3 .utils/repack.py
+	./.venv/bin/python3 .utils/repack.py $(REPACK_ARGS)
 
 .PHONY: check
 check: venv requirements

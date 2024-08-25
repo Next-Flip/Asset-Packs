@@ -12,5 +12,5 @@ The scope of this repo is keeping the asset packs themselves updated and recompi
 
 You can do this by:
 ```bash
-    make repack
+    make repack [pack-name]
 ```

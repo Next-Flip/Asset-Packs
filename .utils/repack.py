@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import sys
 import shutil
 import pathlib
 import tarfile
@@ -35,8 +36,20 @@ def repack(pack_set: pathlib.Path) -> None:
 
 
 if __name__ == "__main__":
-    pack_sets = pathlib.Path(__file__).parent.parent
-    for pack_set in pack_sets.iterdir():
-        if pack_set.name.startswith(".") or not pack_set.is_dir():
+    args = sys.argv[1:]
+    root = pathlib.Path(__file__).parent.parent
+    if args:
+        pack_sets = args
+    else:
+        pack_sets = [
+            pack_set.name
+            for pack_set in root.iterdir()
+            if not pack_set.name.startswith(".")
+        ]
+    for pack_set in pack_sets:
+        pack_set = root / pack_set
+        if not pack_set.is_dir():
+            if args:
+                print(f"\nPack '{pack_set.name}' does not exist!\n", flush=True)
             continue
         repack(pack_set)
