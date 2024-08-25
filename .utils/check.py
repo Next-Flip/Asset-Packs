@@ -6,6 +6,14 @@ import pathlib
 from ext import tarball
 from ext import ziparch
 
+here = pathlib.Path(__file__).parent
+packs_root = here.parent
+
+# In firmware repo, cd into assets/icons and run in bash:
+# for icon in */*.png */*/frame_rate; do echo "$icon"; done > icons.txt
+# TODO: Automate and/or provide a list via API or firmware repo
+known_icons = (here / "icons.txt").read_text().splitlines()
+
 
 def check(pack_set: pathlib.Path) -> None:
     # Downloads
@@ -32,6 +40,25 @@ def check(pack_set: pathlib.Path) -> None:
     icons += list(pack_set.glob("source/*/Icons/*/*/meta"))
     assert anims or fonts or icons, "Must have some content (Anims or Fonts or Icons)"
 
+    # Icons
+    unknown = []
+    for icon in icons:
+        if icon.name in ("frame_rate", "meta"):
+            icon = icon.with_name("frame_rate")
+            icon_name = icon.parts[-3:]
+            icon_path = icon.parts[-5:]
+        elif icon.suffix in (".png", ".bmx"):
+            icon = icon.with_suffix(".png")
+            icon_name = icon.parts[-2:]
+            icon_path = icon.parts[-4:]
+        else:
+            continue
+        if "/".join(icon_name) not in known_icons:
+            unknown.append("/".join(icon_path))
+    if unknown:
+        print(f"\nPack '{pack_set.name}' has {len(unknown)} unknown icons:", flush=True)
+        print("\n".join(unknown), flush=True)
+
     # Meta
     with (pack_set / "meta.json").open() as f_meta:
         meta = json.load(f_meta)
@@ -41,16 +68,23 @@ def check(pack_set: pathlib.Path) -> None:
 
 
 if __name__ == "__main__":
-    pack_sets = pathlib.Path(__file__).parent.parent
-    for pack_set in pack_sets.iterdir():
+    ret = 0
+
+    for pack_set in packs_root.iterdir():
         if pack_set.name.startswith(".") or not pack_set.is_dir():
             continue
+
         try:
             check(pack_set)
         except Exception as exc:
             if not isinstance(exc, AssertionError):
                 raise
-            print(f"\nPack {pack_set.name} has wrong format:", flush=True)
+            print(f"\nPack '{pack_set.name}' has wrong format:", flush=True)
             print(f"{exc}\n", flush=True)
-            sys.exit(1)
-    print("\nNo problems detected!", flush=True)
+            ret = 1
+
+    if ret == 0:
+        print("\nAll formats are correct!", flush=True)
+    else:
+        print("\nSome packs have wrong format!", flush=True)
+    sys.exit(ret)
