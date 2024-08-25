@@ -2,6 +2,7 @@
 import shutil
 import pathlib
 import tarfile
+import functools
 
 from ext import asset_packer
 from ext import tarball
@@ -19,7 +20,7 @@ def _tar_filter(tarinfo: tarfile.TarInfo):
 def repack(pack_set: pathlib.Path) -> None:
     source = pack_set / "source"
     packed = pack_set / ".packed"
-    asset_packer.pack(source, packed, logger=print)
+    asset_packer.pack(source, packed, logger=functools.partial(print, flush=True))
 
     output = pack_set / "download"
     shutil.rmtree(output, ignore_errors=True)
