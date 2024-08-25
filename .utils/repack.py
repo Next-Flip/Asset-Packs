@@ -11,7 +11,7 @@ from ext import ziparch
 RESOURCE_ENTRY_NAME_MAX_LENGTH = 100
 
 
-def _tar_filter(tarinfo: tarfile.TarInfo):
+def _tar_filter(tarinfo: tarfile.TarInfo) -> tarfile.TarInfo:
     if len(tarinfo.name) > RESOURCE_ENTRY_NAME_MAX_LENGTH:
         raise ValueError("Resource name too long")
     return tarball.tar_sanitizer_filter(tarinfo)
