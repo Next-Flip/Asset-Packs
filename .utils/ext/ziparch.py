@@ -29,6 +29,8 @@ def compress_tree_ziparch(
     ) as ziparch:
         for cur, dirs, files in os.walk(top):
             cur = pathlib.Path(cur)
+            dirs.sort()
+            files.sort()
 
             if cur != top:
                 zipinfo = zipfile.ZipInfo.from_file(cur, cur.relative_to(top))

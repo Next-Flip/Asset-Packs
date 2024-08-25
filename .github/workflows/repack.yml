@@ -1,18 +1,18 @@
-name: "Poll"
+name: "Repack"
 
 on:
   push:
   pull_request:
 
 jobs:
-  poll:
-    runs-on: ubuntu-24.04
+  repack:
+    runs-on: ubuntu-latest
     steps:
 
       - name: "Setup Python"
         uses: "actions/setup-python@v4"
         with:
-          python-version: 3.12.4
+          python-version: 3.11.9
 
       - name: "Checkout code"
         uses: actions/checkout@v4
