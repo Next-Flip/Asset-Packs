@@ -13,6 +13,13 @@ PACK_ID_REGEX = re.compile(r"^[a-z0-9][a-z-0-9]+[a-z0-9]$")
 here = pathlib.Path(__file__).parent
 packs_root = here.parent
 
+known_fonts = [
+    "Primary",
+    "Secondary",
+    "Keyboard",
+    "BigNumbers",
+    "BatteryPercent",
+]
 # In firmware repo, cd into assets/icons and run in bash:
 # for icon in */*.png */*/frame_rate; do echo "$icon"; done > icons.txt
 # TODO: Automate and/or provide a list via API or firmware repo
@@ -70,8 +77,16 @@ def check(pack_set: pathlib.Path) -> None:
     expected = sorted(("name", "author", "source_url", "description"))
     assert properties == expected, f"Must have {expected} in meta.json"
 
-    # Icons
+    # Fonts and Icons validity
     unknown = []
+    for font in total_fonts:
+        if font.suffix in (".c", ".u8f"):
+            font_name = font.stem
+            font_path = font.parts[-3:]
+        else:
+            continue
+        if font_name not in known_fonts:
+            unknown.append("/".join(font_path))
     for icon in total_icons:
         if icon.name in ("frame_rate", "meta"):
             icon_name = icon.with_name("frame_rate").parts[-3:]
@@ -84,7 +99,8 @@ def check(pack_set: pathlib.Path) -> None:
         if "/".join(icon_name) not in known_icons:
             unknown.append("/".join(icon_path))
     if unknown:
-        print(f"\nPack '{pack_set.name}' has {len(unknown)} unknown icons:", flush=True)
+        # Don't assert, maybe pack author includes extra options to switch between
+        print(f"\nPack '{pack_set.name}' has unknown content:", flush=True)
         print("\n".join(unknown), flush=True)
 
 
