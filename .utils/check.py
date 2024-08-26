@@ -40,18 +40,39 @@ def check(pack_set: pathlib.Path) -> None:
     assert previews in range(1, 8), "Must have between 1 and 7 previews"
 
     # Source
-    anims = list(pack_set.glob("source/*/Anims/manifest.txt"))
-    fonts = list(pack_set.glob("source/*/Fonts/*.c"))
-    fonts += list(pack_set.glob("source/*/Fonts/*.u8f"))
-    icons = list(pack_set.glob("source/*/Icons/*/*.png"))
-    icons += list(pack_set.glob("source/*/Icons/*/*.bmx"))
-    icons += list(pack_set.glob("source/*/Icons/*/*/frame_rate"))
-    icons += list(pack_set.glob("source/*/Icons/*/*/meta"))
-    assert anims or fonts or icons, "Must have some content (Anims or Fonts or Icons)"
+    packs = []
+    total_fonts = []
+    total_icons = []
+    for pack in (pack_set / "source").iterdir():
+        path = "/".join(pack.parts[-3:])
+        assert (
+            not pack.name.startswith(".") and pack.is_dir()
+        ), f"Source path '{path}' is invalid"
+        has_anims = (pack / "Anims/manifest.txt").is_file()
+        has_fonts = list(pack.glob("Fonts/*.c"))
+        has_fonts += list(pack.glob("Fonts/*.u8f"))
+        total_fonts += has_fonts
+        has_icons = list(pack.glob("Icons/*/*.png"))
+        has_icons += list(pack.glob("Icons/*/*.bmx"))
+        has_icons += list(pack.glob("Icons/*/*/frame_rate"))
+        has_icons += list(pack.glob("Icons/*/*/meta"))
+        total_icons += has_icons
+        assert (
+            has_anims or has_fonts or has_icons
+        ), f"Source '{path}' has no content (Anims or Fonts or Icons)"
+        packs.append(pack)
+    assert packs, "Must have some asset pack source content"
+
+    # Meta
+    with (pack_set / "meta.json").open() as f_meta:
+        meta = json.load(f_meta)
+    properties = sorted(list(meta.keys()))
+    expected = sorted(("name", "author", "source_url", "description"))
+    assert properties == expected, f"Must have {expected} in meta.json"
 
     # Icons
     unknown = []
-    for icon in icons:
+    for icon in total_icons:
         if icon.name in ("frame_rate", "meta"):
             icon = icon.with_name("frame_rate")
             icon_name = icon.parts[-3:]
@@ -67,13 +88,6 @@ def check(pack_set: pathlib.Path) -> None:
     if unknown:
         print(f"\nPack '{pack_set.name}' has {len(unknown)} unknown icons:", flush=True)
         print("\n".join(unknown), flush=True)
-
-    # Meta
-    with (pack_set / "meta.json").open() as f_meta:
-        meta = json.load(f_meta)
-    properties = sorted(list(meta.keys()))
-    expected = sorted(("name", "author", "source_url", "description"))
-    assert properties == expected, f"Must have {expected} in meta.json"
 
 
 if __name__ == "__main__":
