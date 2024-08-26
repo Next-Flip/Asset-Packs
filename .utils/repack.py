@@ -44,15 +44,15 @@ if __name__ == "__main__":
     if args:
         pack_sets = [packs_root / arg for arg in args]
     else:
-        pack_sets = [
-            pack_set
-            for pack_set in packs_root.iterdir()
-            if not pack_set.name.startswith(".")
-        ]
+        pack_sets = [pack_set for pack_set in packs_root.iterdir()]
 
     for pack_set in pack_sets:
+        if pack_set.name.startswith("."):
+            if args:
+                print(f"\nPack '{pack_set.name}' can't start with . !\n", flush=True)
+            continue
         if not pack_set.is_dir():
             if args:
-                print(f"\nPack '{pack_set.name}' does not exist!\n", flush=True)
+                print(f"\nPack '{pack_set.name}' is not a directory!\n", flush=True)
             continue
         repack(pack_set)

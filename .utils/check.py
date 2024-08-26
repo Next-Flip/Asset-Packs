@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
+import re
 import sys
 import json
 import pathlib
 
 from ext import tarball
 from ext import ziparch
+
+# Pack IDs must be 3 or more lowercase letters, letters and dashes, no dashes at begin/end
+PACK_ID_REGEX = re.compile(r"^[a-z0-9][a-z-0-9]+[a-z0-9]$")
 
 here = pathlib.Path(__file__).parent
 packs_root = here.parent
@@ -16,6 +20,11 @@ known_icons = (here / "icons.txt").read_text().splitlines()
 
 
 def check(pack_set: pathlib.Path) -> None:
+    # Pack ID
+    assert PACK_ID_REGEX.match(
+        pack_set.name
+    ), "Must be 3 or more lowercase letters, letters and dashes, no dashes at begin/end"
+
     # Downloads
     assert (
         pack_set / f"download/{pack_set.name}{ziparch.ZIP_ARCH_EXTENSION}"
