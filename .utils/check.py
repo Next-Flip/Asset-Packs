@@ -74,12 +74,10 @@ def check(pack_set: pathlib.Path) -> None:
     unknown = []
     for icon in total_icons:
         if icon.name in ("frame_rate", "meta"):
-            icon = icon.with_name("frame_rate")
-            icon_name = icon.parts[-3:]
+            icon_name = icon.with_name("frame_rate").parts[-3:]
             icon_path = icon.parts[-5:]
         elif icon.suffix in (".png", ".bmx"):
-            icon = icon.with_suffix(".png")
-            icon_name = icon.parts[-2:]
+            icon_name = icon.with_suffix(".png").parts[-2:]
             icon_path = icon.parts[-4:]
         else:
             continue
