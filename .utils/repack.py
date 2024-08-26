@@ -42,16 +42,15 @@ if __name__ == "__main__":
     args = sys.argv[1:]
 
     if args:
-        pack_sets = args
+        pack_sets = [packs_root / arg for arg in args]
     else:
         pack_sets = [
-            pack_set.name
+            pack_set
             for pack_set in packs_root.iterdir()
             if not pack_set.name.startswith(".")
         ]
 
     for pack_set in pack_sets:
-        pack_set = packs_root / pack_set
         if not pack_set.is_dir():
             if args:
                 print(f"\nPack '{pack_set.name}' does not exist!\n", flush=True)
