@@ -15,6 +15,6 @@ You can do this by:
     make repack [pack-name]
 ```
 
-Currently we don't have a convenient way of generating previews. For now what we do it:
+Currently we don't have a convenient way of generating previews. For now what we do is:
 - For Icons: use [qFlipper](https://flipperzero.one/update), click 'Save Screenshot'
 - For Anims: use [qFlipper](https://flipperzero.one/update), record it (e.g. with [Blue Recorder](https://flathub.org/apps/sa.sy.bluerecorder)), cut it with `ffmpeg -i in.gif -vf "crop=512:256:66:82" out.gif`
