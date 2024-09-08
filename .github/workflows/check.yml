@@ -45,3 +45,11 @@ jobs:
           gunzip -- */download/*.tar.gz
           git add --intent-to-add -- */download/*.tar
           git diff --exit-code -- */download/*.tar
+
+      - name: "Trigger reindex"
+        env:
+          INDEXER_URL: ${{ secrets.INDEXER_URL }}
+        if: ${{ env.INDEXER_URL != '' && github.ref_name == 'dev' }}
+        run: |
+          curl --fail -L -H "Token: ${{ secrets.INDEXER_TOKEN }}" \
+              "${{ secrets.INDEXER_URL }}"/asset-packs/reindex;
