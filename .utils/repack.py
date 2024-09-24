@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
-import sys
 import shutil
 import pathlib
 import tarfile
 import functools
+
+import common
 
 from ext import asset_packer
 from ext import tarball
 from ext import ziparch
 
 RESOURCE_ENTRY_NAME_MAX_LENGTH = 100
-
-here = pathlib.Path(__file__).parent
-packs_root = here.parent
 
 
 def _tar_filter(tarinfo: tarfile.TarInfo) -> tarfile.TarInfo:
@@ -39,20 +37,5 @@ def repack(pack_set: pathlib.Path) -> None:
 
 
 if __name__ == "__main__":
-    args = sys.argv[1:]
-
-    if args:
-        pack_sets = [packs_root / arg for arg in args]
-    else:
-        pack_sets = [pack_set for pack_set in packs_root.iterdir()]
-
-    for pack_set in pack_sets:
-        if pack_set.name.startswith("."):
-            if args:
-                print(f"\nPack '{pack_set.name}' can't start with . !\n", flush=True)
-            continue
-        if not pack_set.is_dir():
-            if args:
-                print(f"\nPack '{pack_set.name}' is not a directory!\n", flush=True)
-            continue
+    for pack_set in common.cli_pack_sets():
         repack(pack_set)

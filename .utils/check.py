@@ -4,6 +4,8 @@ import sys
 import json
 import pathlib
 
+import common
+
 from ext import tarball
 from ext import ziparch
 
@@ -107,10 +109,7 @@ def check(pack_set: pathlib.Path) -> None:
 if __name__ == "__main__":
     ret = 0
 
-    for pack_set in packs_root.iterdir():
-        if pack_set.name.startswith(".") or not pack_set.is_dir():
-            continue
-
+    for pack_set in common.cli_pack_sets():
         try:
             check(pack_set)
         except Exception as exc:
@@ -121,7 +120,10 @@ if __name__ == "__main__":
             ret = 1
 
     if ret == 0:
-        print("\nAll formats are correct!", flush=True)
+        print(
+            f"\nAll {'requested ' if sys.argv[1:] else ''}packs formats are correct!",
+            flush=True,
+        )
     else:
         print("\nSome packs have wrong format!", flush=True)
     sys.exit(ret)
