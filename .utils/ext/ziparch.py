@@ -12,9 +12,9 @@ def zip_sanitizer_filter(zipinfo: zipfile.ZipInfo):
     zipinfo.date_time = (1980, 1, 1, 0, 0, 0)  # Minimum date
     if zipinfo.is_dir():
         zipinfo.external_attr = 0o40775 << 16  # drwxrwxr-x
-        zipinfo.external_attr |= 0x10          # MS-DOS directory flag
+        zipinfo.external_attr |= 0x10  # MS-DOS directory flag
     else:
-        zipinfo.external_attr = 0o664 << 16    # ?rw-rw-r--
+        zipinfo.external_attr = 0o664 << 16  # ?rw-rw-r--
     zipinfo.create_system = 0  # Unix-like
     return zipinfo
 
