@@ -12,9 +12,29 @@ endif
 repack: venv requirements
 	./.venv/bin/python3 .utils/repack.py $(REPACK_ARGS)
 
+# If the first argument is "check"...
+ifeq (check,$(firstword $(MAKECMDGOALS)))
+  # use the rest as arguments for "check"
+  CHECK_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  # ...and turn them into do-nothing targets
+  $(eval $(CHECK_ARGS):;@:)
+endif
+
 .PHONY: check
 check: venv requirements
-	./.venv/bin/python3 .utils/check.py
+	./.venv/bin/python3 .utils/check.py $(CHECK_ARGS)
+
+# If the first argument is "previews"...
+ifeq (previews,$(firstword $(MAKECMDGOALS)))
+  # use the rest as arguments for "previews"
+  PREVIEWS_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  # ...and turn them into do-nothing targets
+  $(eval $(PREVIEWS_ARGS):;@:)
+endif
+
+.PHONY: previews
+previews: venv requirements
+	./.venv/bin/python3 .utils/previews.py $(PREVIEWS_ARGS)
 
 venv:
 	python3 -m venv .venv

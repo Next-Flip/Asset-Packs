@@ -1,34 +1,17 @@
 #!/usr/bin/env python3
-import re
 import sys
 import json
 import pathlib
 
+import common
+
 from ext import tarball
 from ext import ziparch
-
-# Pack IDs must be 3 or more lowercase letters, letters and dashes, no dashes at begin/end
-PACK_ID_REGEX = re.compile(r"^[a-z0-9][a-z-0-9]+[a-z0-9]$")
-
-here = pathlib.Path(__file__).parent
-packs_root = here.parent
-
-known_fonts = [
-    "Primary",
-    "Secondary",
-    "Keyboard",
-    "BigNumbers",
-    "BatteryPercent",
-]
-# In firmware repo, cd into assets/icons and run in bash:
-# for icon in */*.png */*/frame_rate; do echo "$icon"; done > icons.txt
-# TODO: Automate and/or provide a list via API or firmware repo
-known_icons = (here / "icons.txt").read_text().splitlines()
 
 
 def check(pack_set: pathlib.Path) -> None:
     # Pack ID
-    assert PACK_ID_REGEX.match(
+    assert common.PACK_ID_REGEX.match(
         pack_set.name
     ), "Must be 3 or more lowercase letters, letters and dashes, no dashes at begin/end"
 
@@ -85,7 +68,7 @@ def check(pack_set: pathlib.Path) -> None:
             font_path = font.parts[-3:]
         else:
             continue
-        if font_name not in known_fonts:
+        if font_name not in common.known_fonts:
             unknown.append("/".join(font_path))
     for icon in total_icons:
         if icon.name in ("frame_rate", "meta"):
@@ -96,7 +79,7 @@ def check(pack_set: pathlib.Path) -> None:
             icon_path = icon.parts[-4:]
         else:
             continue
-        if "/".join(icon_name) not in known_icons:
+        if "/".join(icon_name) not in common.known_icons:
             unknown.append("/".join(icon_path))
     if unknown:
         # Don't assert, maybe pack author includes extra options to switch between
@@ -107,10 +90,7 @@ def check(pack_set: pathlib.Path) -> None:
 if __name__ == "__main__":
     ret = 0
 
-    for pack_set in packs_root.iterdir():
-        if pack_set.name.startswith(".") or not pack_set.is_dir():
-            continue
-
+    for pack_set in common.cli_pack_sets():
         try:
             check(pack_set)
         except Exception as exc:
@@ -121,7 +101,10 @@ if __name__ == "__main__":
             ret = 1
 
     if ret == 0:
-        print("\nAll formats are correct!", flush=True)
+        print(
+            f"\nAll {'requested ' if sys.argv[1:] else ''}packs formats are correct!",
+            flush=True,
+        )
     else:
         print("\nSome packs have wrong format!", flush=True)
     sys.exit(ret)
