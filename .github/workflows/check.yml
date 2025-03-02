@@ -34,7 +34,7 @@ jobs:
 
       - name: "Regenerate icons.txt"
         run: |
-          cd firmware/assets/icons
+          cd .firmware/assets/icons
           for icon in */*.png */*/frame_rate; do echo "$icon"; done | LC_COLLATE=C sort -fs > ../../../.utils/icons.txt
           cd ../../..
           rm -rf .firmware
