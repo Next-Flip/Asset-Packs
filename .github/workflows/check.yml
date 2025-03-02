@@ -52,6 +52,7 @@ jobs:
       - name: "Upload artifacts to GitHub"
         uses: actions/upload-artifact@v4
         with:
+          include-hidden-files: true
           path: |
             */download
             .utils/icons.txt
