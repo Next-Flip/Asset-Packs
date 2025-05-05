@@ -22,6 +22,7 @@ Archive/mag_card_10px.png
 Archive/music_10px.png
 Archive/Nfc_10px.png
 Archive/search_10px.png
+Archive/settings_10px.png
 Archive/sub1_10px.png
 Archive/subplaylist_10px.png
 Archive/subrem_10px.png
