@@ -24,20 +24,36 @@ def check(pack_set: pathlib.Path) -> None:
     ).is_file(), f"Must have packed {tarball.TAR_GZIP_EXTENSION} download"
 
     # Previews
-    previews = 0
+    preview_files = []
     for ext in (".png", ".jpg", ".gif"):
-        previews += sum(1 for _ in pack_set.glob(f"preview/*{ext}"))
-    assert previews in range(1, 8), "Must have between 1 and 7 previews"
+        preview_files.extend(pack_set.glob(f"preview/*{ext}"))
+
+    preview_files = [f for f in preview_files if not f.name.startswith(".")]
+    expected_previews = set(range(1, len(preview_files) + 1))
+    actual_previews = set()
+
+    for preview_file in preview_files:
+        try:
+            number = int(preview_file.stem)
+            actual_previews.add(number)
+        except ValueError:
+            assert (
+                False
+            ), f"Preview file '{preview_file.name}' must be numbered (e.g., 1.gif, 2.png, etc.)"
+
+    assert (
+        actual_previews == expected_previews
+    ), f"Preview files must be numbered sequentially starting from 1. Expected: {sorted(expected_previews)}, Found: {sorted(actual_previews)}"
 
     # Source
     packs = []
     total_fonts = []
     total_icons = []
     for pack in (pack_set / "source").iterdir():
+        if pack.name.startswith("."):
+            continue
         path = "/".join(pack.parts[-3:])
-        assert (
-            not pack.name.startswith(".") and pack.is_dir()
-        ), f"Source path '{path}' is invalid"
+        assert pack.is_dir(), f"Source path '{path}' must be a directory"
         has_anims = (pack / "Anims/manifest.txt").is_file()
         has_fonts = list(pack.glob("Fonts/*.c"))
         has_fonts += list(pack.glob("Fonts/*.u8f"))
@@ -57,8 +73,8 @@ def check(pack_set: pathlib.Path) -> None:
     with (pack_set / "meta.json").open() as f_meta:
         meta = json.load(f_meta)
     properties = sorted(list(meta.keys()))
-    expected = sorted(("name", "author", "source_url", "description"))
-    assert properties == expected, f"Must have {expected} in meta.json"
+    expected_meta = sorted(("name", "author", "source_url", "description"))
+    assert properties == expected_meta, f"Must have {expected_meta} in meta.json"
 
     # Fonts and Icons validity
     unknown = []
