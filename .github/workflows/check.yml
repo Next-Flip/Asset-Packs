@@ -64,13 +64,17 @@ jobs:
           git diff --exit-code -- */download/*.tar .utils/icons.txt
 
       - name: "Trigger reindex"
-        if: ${{ secrets.INDEXER_URL != '' && github.ref_name == 'dev' }}
+        env:
+          INDEXER_URL: ${{ secrets.INDEXER_URL }}
+        if: ${{ env.INDEXER_URL != '' && github.ref_name == 'dev' }}
         run: |
           curl --fail -L -H "Token: ${{ secrets.INDEXER_TOKEN }}" \
               "${{ secrets.INDEXER_URL }}"/asset-packs/reindex;
 
       - name: "Force deploy website to refresh asset packs"
-        if: ${{ secrets.INDEXER_URL != '' && github.ref_name == 'dev' }}
+        env:
+          INDEXER_URL: ${{ secrets.INDEXER_URL }}
+        if: ${{ env.INDEXER_URL != '' && github.ref_name == 'dev' }}
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.REPO_DISPATCH_TOKEN }}
