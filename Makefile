@@ -24,8 +24,8 @@ endif
 check: venv requirements
 	./.venv/bin/python3 .utils/check.py $(CHECK_ARGS)
 
-# If the first argument is "previews"...
-ifeq (previews,$(firstword $(MAKECMDGOALS)))
+# Handle previews arguments for pack processing
+ifneq (,$(filter previews,$(MAKECMDGOALS)))
   # use the rest as arguments for "previews"
   PREVIEWS_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
   # ...and turn them into do-nothing targets
