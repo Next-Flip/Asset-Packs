@@ -40,28 +40,28 @@ python3 .utils/previews.py [pack-name]
 
 ```zig
 baba-is-you/
-├── download
+├── download/
 │   ├── baba-is-you.tar.gz
 │   └── baba-is-you.zip
 ├── meta.json
-├── preview
+├── preview/
 │   ├── 1.gif
 │   ├── 2.png
 │   ├── 3.png
 │   └── 4.png
-└── source
-    └── BABA IS YOU
-        ├── Anims
-        │   ├── BABA_IS_YOU
+└── source/
+    └── BABA IS YOU/
+        ├── Anims/
+        │   ├── BABA_IS_YOU/
         │   │   ├── frame_0.bm
         │   │   ├── frame_1.bm
         │   │   ├── frame_2.bm
         │   │   └── meta.txt
         │   └── manifest.txt
-        ├── Fonts
-        │   ...
-        └── Icons
-            ...
+        ├── Fonts/
+        │   └── ...
+        └── Icons/
+            └── ...
 ```
 
 ## Support
