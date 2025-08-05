@@ -63,20 +63,44 @@ jobs:
           git add --intent-to-add -- */download/*.tar
           git diff --exit-code -- */download/*.tar .utils/icons.txt
 
+      - name: "Configure for Reindex"
+        run: |
+          if ${{ secrets.INDEXER_URL == '' }} ; then
+            exit
+          fi
+          if ${{ github.event_name == 'push' }} ; then
+            if ${{ github.ref_name == 'dev' }} ; then
+              SHOULD_REINDEX=true
+            fi
+          fi
+          echo "SHOULD_REINDEX=$SHOULD_REINDEX" >> $GITHUB_ENV
+
       - name: "Trigger reindex"
-        env:
-          INDEXER_URL: ${{ secrets.INDEXER_URL }}
-        if: ${{ env.INDEXER_URL != '' && github.ref_name == 'dev' }}
+        if: ${{ env.SHOULD_REINDEX == 'true' }}
         run: |
           curl --fail -L -H "Token: ${{ secrets.INDEXER_TOKEN }}" \
               "${{ secrets.INDEXER_URL }}"/asset-packs/reindex;
 
       - name: "Force deploy website to refresh asset packs"
-        env:
-          INDEXER_URL: ${{ secrets.INDEXER_URL }}
-        if: ${{ env.INDEXER_URL != '' && github.ref_name == 'dev' }}
-        uses: peter-evans/repository-dispatch@v3
+        if: ${{ env.SHOULD_REINDEX == 'true' }}
+        uses: Codex-/return-dispatch@v2
+        id: force-deploy
         with:
           token: ${{ secrets.REPO_DISPATCH_TOKEN }}
-          repository: Next-Flip/v2.momentum-fw.dev
-          event-type: force-deploy
+          ref: dev
+          repo: v2.momentum-fw.dev
+          owner: Next-Flip
+          workflow: force-deploy.yml
+          workflow_timeout_seconds: 300
+          workflow_job_steps_retry_seconds: 5
+
+      - name: "Wait for deploy (Run ID ${{ steps.force-deploy.outputs.run_id }})"
+        if: ${{ env.SHOULD_REINDEX == 'true' }}
+        uses: Codex-/await-remote-run@v1
+        with:
+          token: ${{ github.token }}
+          repo: v2.momentum-fw.dev
+          owner: Next-Flip
+          run_id: ${{ steps.force-deploy.outputs.run_id }}
+          run_timeout_seconds: 300
+          poll_interval_ms: 5000
